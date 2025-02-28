@@ -4,12 +4,18 @@ import java.awt.*;
 public class Face {
 
     public Point[] orderedPoints;
-    private int[] Xs;
-    private int[] Ys;
-    private int numOfPoints;
+
 
     public Face(Point[] points, int focalLength) {
         orderedPoints = points;
+
+    }
+
+    public void draw(Graphics g,int focalLength) {
+        int[] Xs;
+        int[] Ys;
+        int numOfPoints;
+
         Xs = new int[orderedPoints.length];
         Ys = new int[orderedPoints.length];
         numOfPoints = orderedPoints.length;
@@ -17,9 +23,7 @@ public class Face {
             Xs[i] = ((focalLength* orderedPoints[i].X)/(focalLength+ orderedPoints[i].Z))+400;
             Ys[i] = ((focalLength* orderedPoints[i].Y)/(focalLength+ orderedPoints[i].Z))+400;
         }
-    }
 
-    public void draw(Graphics g,int focalLength) {
         g.fillPolygon(Xs,Ys,numOfPoints);
     }
 }
