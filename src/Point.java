@@ -1,15 +1,15 @@
 /* This provides an easy way to store coordinates */
 public class Point {
 
-    public int X;
-    public int Y;
-    public int Z;
-    public int[] pos;
+    public double X;
+    public double Y;
+    public double Z;
+    public double[] pos;
 
-    public Point(int x, int y, int z) {
+    public Point(double x, double y, double z) {
         X = x;
         Y = y;
         Z = z;
-        pos = new int[]{x, y, z};
+        pos = new double[]{x, y, z};
     }
 }

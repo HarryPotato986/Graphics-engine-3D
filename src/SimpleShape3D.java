@@ -64,13 +64,10 @@ public class SimpleShape3D {
 
         for (int i = 0; i < points.length; i++) {
             Point oldPoint = points[i];
-            int x = oldPoint.X;
-            int y = oldPoint.Y;
-            int z = oldPoint.Z;
-            long newY = Math.round((y * cos) + (z * sin));
-            long newZ = Math.round((y * (-1 * sin)) + (z * cos));
-            //System.out.println("new Y as int: " + (int) newY + "  as long: " + newY);
-            Point newPoint = new Point(x, (int) newY, (int) newZ);
+            double x = oldPoint.X;
+            double y = oldPoint.Y;
+            double z = oldPoint.Z;
+            Point newPoint = new Point(x, (y * cos) + (z * sin), (y * (-1 * sin)) + (z * cos));
 
             points[i] = newPoint;
         }
@@ -85,12 +82,10 @@ public class SimpleShape3D {
 
         for (int i = 0; i < points.length; i++) {
             Point oldPoint = points[i];
-            int x = oldPoint.X;
-            int y = oldPoint.Y;
-            int z = oldPoint.Z;
-            long newX = Math.round((x * cos) + (z * sin));
-            long newZ = Math.round((x * (-1 * sin)) + (z * cos));
-            Point newPoint = new Point((int) newX, y, (int) newZ);
+            double x = oldPoint.X;
+            double y = oldPoint.Y;
+            double z = oldPoint.Z;
+            Point newPoint = new Point((x * cos) + (z * sin), y, (x * (-1 * sin)) + (z * cos));
 
             points[i] = newPoint;
         }
@@ -105,12 +100,10 @@ public class SimpleShape3D {
 
         for (int i = 0; i < points.length; i++) {
             Point oldPoint = points[i];
-            int x = oldPoint.X;
-            int y = oldPoint.Y;
-            int z = oldPoint.Z;
-            long newX = Math.round((x * cos) + (y * sin));
-            long newY = Math.round((x * (-1 * sin)) + (y * cos));
-            Point newPoint = new Point((int) newX, (int) newY, z);
+            double x = oldPoint.X;
+            double y = oldPoint.Y;
+            double z = oldPoint.Z;
+            Point newPoint = new Point((x * cos) + (y * sin), (x * (-1 * sin)) + (y * cos), z);
 
             points[i] = newPoint;
         }

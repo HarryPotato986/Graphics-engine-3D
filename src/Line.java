@@ -14,7 +14,7 @@ public class Line {
     }
 
     public void draw(Graphics g,int focalLength) {
-        g.drawLine(((focalLength* point1.X)/(focalLength+ point1.Z))+400,((focalLength* point1.Y)/(focalLength+ point1.Z))+400,
-                ((focalLength* point2.X)/(focalLength+ point2.Z))+400, ((focalLength* point2.Y)/(focalLength+ point2.Z))+400);
+        g.drawLine((int) ((focalLength* point1.X)/(focalLength+ point1.Z))+400,(int) ((focalLength* point1.Y)/(focalLength+ point1.Z))+400,
+                (int) ((focalLength* point2.X)/(focalLength+ point2.Z))+400, (int) ((focalLength* point2.Y)/(focalLength+ point2.Z))+400);
     }
 }

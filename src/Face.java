@@ -20,8 +20,8 @@ public class Face {
         Ys = new int[orderedPoints.length];
         numOfPoints = orderedPoints.length;
         for (int i = 0; i < orderedPoints.length; i++) {
-            Xs[i] = ((focalLength* orderedPoints[i].X)/(focalLength+ orderedPoints[i].Z))+400;
-            Ys[i] = ((focalLength* orderedPoints[i].Y)/(focalLength+ orderedPoints[i].Z))+400;
+            Xs[i] = (int) ((focalLength* orderedPoints[i].X)/(focalLength+ orderedPoints[i].Z))+400;
+            Ys[i] = (int) ((focalLength* orderedPoints[i].Y)/(focalLength+ orderedPoints[i].Z))+400;
         }
 
         g.fillPolygon(Xs,Ys,numOfPoints);
