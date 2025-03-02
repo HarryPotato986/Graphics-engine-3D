@@ -11,6 +11,9 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
 
     public static final int SCREEN_WIDTH = 800;
     public static final int SCREEN_HEIGHT = 800;
+
+    public static final Vec3D TEMP_CAMERA = new Vec3D(0,0,0);
+
     public int FOCAL_LENGTH = 300;
 
     public float CUBE_ANGLE_X = 0;
@@ -72,7 +75,9 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
         //g.setColor(Color.RED);
         //shape.draw(g);
 
-        cubeMesh.draw(g, matProj, CUBE_ANGLE_X, CUBE_ANGLE_Z);
+        //cubeMesh.draw(g, matProj, CUBE_ANGLE_X, CUBE_ANGLE_Z);
+        donutMesh.draw(g, matProj, CUBE_ANGLE_X, CUBE_ANGLE_Z);
+
     }
 
 
@@ -104,6 +109,10 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
             add(new Triangle(new Vec3D(1,0,1), new Vec3D(0,0,0), new Vec3D(1,0,0)));
         }
     });
+
+    Mesh donutMesh = new Mesh("D:\\Codeing Projects\\graphics engine 3D\\Donut.obj");
+
+
 
     @Override
     public void stateChanged(ChangeEvent e) {
