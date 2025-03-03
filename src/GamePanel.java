@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class GamePanel extends JPanel implements ChangeListener, ActionListener {
 
@@ -18,15 +19,17 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
 
     public float CUBE_ANGLE_X = 0;
     public float CUBE_ANGLE_Z = 0;
+    public float DONUT_ANGLE_X = 0;
+    public float DONUT_ANGLE_Z = 0;
 
     //Projection Matrix
     float fNear = 0.1f;
     float fFar = 1000.0f;
     float fFov = 90.0f;
     float fAspectRatio = (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH;
-    float fFovRad = 1.0f / (float) Math.tan(fFov * 0.5f / 180.0f * Math.PI);
 
-    ProjectionMatrix matProj = new ProjectionMatrix();
+
+    ProjectionMatrix matProj = new ProjectionMatrix(fFov, fAspectRatio, fNear, fFar);
 
 
 
@@ -56,16 +59,11 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
 
         shape.rotateZAxis(-15);
 
-        matProj.matrix[0][0] = fAspectRatio * fFovRad;
-        matProj.matrix[1][1] = fFovRad;
-        matProj.matrix[2][2] = fFar / (fFar - fNear);
-        matProj.matrix[3][2] = (-fFar * fNear) / (fFar - fNear);
-        matProj.matrix[2][3] = 1.0f;
-        matProj.matrix[3][3] = 0.0f;
-
         for (float[] row : matProj.matrix) {
             System.out.println(Arrays.toString(row));
         }
+
+
 
     }
 
@@ -75,9 +73,37 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
         //g.setColor(Color.RED);
         //shape.draw(g);
 
-        //cubeMesh.draw(g, matProj, CUBE_ANGLE_X, CUBE_ANGLE_Z);
-        donutMesh.draw(g, matProj, CUBE_ANGLE_X, CUBE_ANGLE_Z);
+        ArrayList<Triangle> trisToSort = new ArrayList<>();
 
+        trisToSort.addAll(donutMesh.prepareTrisToDraw(g, matProj, DONUT_ANGLE_X, DONUT_ANGLE_Z, Color.BLUE));
+        trisToSort.addAll(cubeMesh.prepareTrisToDraw(g, matProj, CUBE_ANGLE_X, CUBE_ANGLE_Z, Color.RED));
+
+        drawTriangles(g, trisToSort);
+    }
+
+    public void drawTriangles(Graphics g, ArrayList<Triangle> trisToSort) {
+        Triangle[] triArrToSort = new Triangle[trisToSort.size()];
+
+        Arrays.sort(trisToSort.toArray(triArrToSort), (t1, t2) -> {
+            float z1 = (t1.points[0].Z + t1.points[1].Z + t1.points[2].Z) / 3.0f;
+            float z2 = (t2.points[0].Z + t2.points[1].Z + t2.points[2].Z) / 3.0f;
+            return Float.compare(z2, z1);
+        });
+
+        for (Triangle tri : triArrToSort) {
+
+            g.setColor(tri.color);
+            int[] Xs = new int[]{(int) tri.points[0].X, (int) tri.points[1].X, (int) tri.points[2].X};
+            int[] Ys = new int[]{(int) tri.points[0].Y, (int) tri.points[1].Y, (int) tri.points[2].Y};
+            g.fillPolygon(Xs, Ys, 3);
+
+            /*
+            g.setColor(Color.black);
+            g.drawLine((int) tri.points[0].X, (int) tri.points[0].Y, (int) tri.points[1].X, (int) tri.points[1].Y);
+            g.drawLine((int) tri.points[1].X, (int) tri.points[1].Y, (int) tri.points[2].X, (int) tri.points[2].Y);
+            g.drawLine((int) tri.points[2].X, (int) tri.points[2].Y, (int) tri.points[0].X, (int) tri.points[0].Y);
+            */
+        }
     }
 
 
@@ -133,6 +159,8 @@ public class GamePanel extends JPanel implements ChangeListener, ActionListener 
 
         CUBE_ANGLE_X += 1.25f;
         CUBE_ANGLE_Z += 2.5f;
+        DONUT_ANGLE_X += 2.5f;
+        DONUT_ANGLE_Z += 1.25f;
         repaint();
     }
 }

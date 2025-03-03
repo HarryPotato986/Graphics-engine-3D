@@ -1,12 +1,15 @@
+import java.awt.*;
+
 public class Triangle {
 
-    RotationMatrix matRot = new RotationMatrix();
+    //RotationMatrix matRot = new RotationMatrix();
 
 
     public Vec3D[] points;
     public Vec3D normal;
 
     public float lum;
+    public Color color;
 
     Triangle(Vec3D p1, Vec3D p2, Vec3D p3) {
         points = new Vec3D[]{p1,p2,p3};
@@ -26,15 +29,11 @@ public class Triangle {
 
     private void generateNormal() {
         Vec3D[] p = points;
-        Vec3D line1 = new Vec3D(p[1].X - p[0].X, p[1].Y - p[0].Y, p[1].Z - p[0].Z);
-        Vec3D line2 = new Vec3D(p[2].X - p[0].X, p[2].Y - p[0].Y, p[2].Z - p[0].Z);
-        normal = new Vec3D(
-                line1.Y * line2.Z - line1.Z * line2.Y,
-                line1.Z * line2.X - line1.X * line2.Z,
-                line1.X * line2.Y - line1.Y * line2.X);
+        Vec3D line1 = new Vec3D(Vec3D.subtract(p[1], p[0]));
+        Vec3D line2 = new Vec3D(Vec3D.subtract(p[2], p[0]));
+        normal = new Vec3D(Vec3D.crossProduct(line1, line2));
 
-        float l = (float) Math.sqrt(normal.X * normal.X + normal.Y * normal.Y + normal.Z * normal.Z);
-        normal.X /= l; normal.Y /= l; normal.Z /= l;
+        normal.normalize();
     }
 
     public void translate(float x, float y, float z) {
@@ -45,6 +44,7 @@ public class Triangle {
         generateNormal();
     }
 
+    /*
     public void rotate(float angleDeg, RotationAxis axis) {
         matRot.updateMatrix(angleDeg, axis);
         points[0] = matRot.RotationMultiply(points[0]);
@@ -53,9 +53,26 @@ public class Triangle {
 
         generateNormal();
     }
+    */
 
     public void updateLighting(Vec3D lightDir) {
-        float dp = normal.X * lightDir.X + normal.Y * lightDir.Y + normal.Z * lightDir.Z;
-        lum = (dp + 1.0f) / 2.0f;
+        float dp = Vec3D.dotProduct(normal, lightDir);
+        float temp = (dp + 1.0f) / 2.0f;
+        if (temp <= 1.0f) {
+            lum = temp;
+        } else {
+            lum = 1.0f;
+        }
+    }
+
+    public void updateColor(Color newColor) {
+        int R = (int) (newColor.getRed() * lum);
+        int G = (int) (newColor.getGreen() * lum);
+        int B = (int) (newColor.getBlue() * lum);
+        color = new Color(R, G, B);
+    }
+
+    public void forceColor(Color newColor) {
+        color = newColor;
     }
 }

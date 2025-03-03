@@ -1,7 +1,15 @@
 public class ProjectionMatrix extends Matrix{
 
-    ProjectionMatrix() {
+    ProjectionMatrix(float fFov, float fAspectRatio, float fNear, float fFar) {
         super(4, 4);
+
+        float fFovRad = 1.0f / (float) Math.tan(fFov * 0.5f / 180.0f * Math.PI);
+        matrix[0][0] = fAspectRatio * fFovRad;
+        matrix[1][1] = fFovRad;
+        matrix[2][2] = fFar / (fFar - fNear);
+        matrix[3][2] = (-fFar * fNear) / (fFar - fNear);
+        matrix[2][3] = 1.0f;
+        matrix[3][3] = 0.0f;
     }
 
     public Vec3D projMultiply(Vec3D oldVec) {

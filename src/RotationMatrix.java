@@ -1,7 +1,37 @@
 public class RotationMatrix extends Matrix{
 
-    RotationMatrix() {
+    RotationMatrix(float angleDeg, RotationAxis axis) {
         super(4, 4);
+
+        float angleRad = (float) Math.toRadians(angleDeg);
+
+        switch (axis) {
+            case X:
+                this.matrix[0][0] = 1.0f;
+                this.matrix[1][1] = (float) Math.cos(angleRad);
+                this.matrix[1][2] = (float) Math.sin(angleRad);
+                this.matrix[2][1] = (float) -Math.sin(angleRad);
+                this.matrix[2][2] = (float) Math.cos(angleRad);
+                this.matrix[3][3] = 1.0f;
+                break;
+            case Y:
+                this.matrix[0][0] = (float) Math.cos(angleRad);
+                this.matrix[1][1] = 1.0f;
+                this.matrix[2][0] = (float) Math.sin(angleRad);
+                this.matrix[0][2] = (float) -Math.sin(angleRad);
+                this.matrix[2][2] = (float) Math.cos(angleRad);
+                this.matrix[3][3] = 1.0f;
+                break;
+            case Z:
+                this.matrix[0][0] = (float) Math.cos(angleRad);
+                this.matrix[0][1] = (float) Math.sin(angleRad);
+                this.matrix[1][0] = (float) -Math.sin(angleRad);
+                this.matrix[1][1] = (float) Math.cos(angleRad);
+                this.matrix[2][2] = 1.0f;
+                this.matrix[3][3] = 1.0f;
+                break;
+
+        }
     }
 
     public Vec3D RotationMultiply(Vec3D oldVec) {
