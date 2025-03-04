@@ -1,7 +1,7 @@
-public class RotationMatrix extends Matrix{
+public class RotationMatrix extends SquareMatrix{
 
     RotationMatrix(float angleDeg, RotationAxis axis) {
-        super(4, 4);
+        super(4);
 
         float angleRad = (float) Math.toRadians(angleDeg);
 

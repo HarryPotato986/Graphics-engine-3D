@@ -1,7 +1,7 @@
-public class TranslationMatrix extends Matrix{
+public class TranslationMatrix extends SquareMatrix{
 
     TranslationMatrix(float x, float y, float z) {
-        super(4, 4);
+        super(4);
 
         matrix[0][0] = 1.0f;
         matrix[1][1] = 1.0f;

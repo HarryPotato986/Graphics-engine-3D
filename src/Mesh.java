@@ -51,7 +51,7 @@ public class Mesh {
         System.out.println(mesh.size());
     }
 
-    public ArrayList<Triangle> prepareTrisToDraw(Graphics g, ProjectionMatrix matProj, float angleDegX, float angleDegZ, Color baseColor) {
+    public ArrayList<Triangle> prepareTrisToDraw(Graphics g, ProjectionMatrix matProj, PointAtMatrix matView, Vec3D vCamera, float angleDegX, float angleDegZ, Color baseColor) {
         if (angleDegX > 360) {
             angleDegX -= 360;
         }
@@ -66,7 +66,7 @@ public class Mesh {
         TranslationMatrix matTrans = new TranslationMatrix(0.0f, 0.0f, 3.0f);
         IdentityMatrix matI = new IdentityMatrix(4);
 
-        Matrix matWorld = new Matrix(matI);
+        Matrix matWorld;
         matWorld = new Matrix(Matrix.matrixMultiply(matRotZ, matRotX));
         matWorld = new Matrix(Matrix.matrixMultiply(matWorld, matTrans));
 
@@ -80,7 +80,7 @@ public class Mesh {
                                                    Matrix.vectorMultiply(tri.points[1], matWorld),
                                                    Matrix.vectorMultiply(tri.points[2], matWorld));
 
-            Vec3D vCameraRay = Vec3D.subtract(triTransformed.points[0], GamePanel.TEMP_CAMERA);
+            Vec3D vCameraRay = Vec3D.subtract(triTransformed.points[0], vCamera);
 
             if(Vec3D.dotProduct(triTransformed.normal, vCameraRay) < 0.0f) {
 
@@ -91,46 +91,68 @@ public class Mesh {
                 triTransformed.updateLighting(lightDirection);
                 //System.out.println(triTransformed.lum);
 
-                Triangle triProjected = new Triangle(
-                        Matrix.vectorMultiply(triTransformed.points[0], matProj),
-                        Matrix.vectorMultiply(triTransformed.points[1], matProj),
-                        Matrix.vectorMultiply(triTransformed.points[2], matProj));
-                triProjected.lum = triTransformed.lum;
-                triProjected.updateColor(baseColor);
+                Triangle triViewed = new Triangle(
+                        Matrix.vectorMultiply(triTransformed.points[0], matView),
+                        Matrix.vectorMultiply(triTransformed.points[1], matView),
+                        Matrix.vectorMultiply(triTransformed.points[2], matView));
+                triViewed.lum = triTransformed.lum;
 
-                triProjected.points[0] = Vec3D.divide(triProjected.points[0], triProjected.points[0].W);
-                triProjected.points[1] = Vec3D.divide(triProjected.points[1], triProjected.points[1].W);
-                triProjected.points[2] = Vec3D.divide(triProjected.points[2], triProjected.points[2].W);
+                int nClippedTriangles = 0;
+                Triangle[] clipped = new Triangle[]{new Triangle(triViewed), new Triangle(triViewed)};
+                nClippedTriangles = Triangle.clipAgainstPlane(new Vec3D(0.0f, 0.0f, 0.1f), new Vec3D(0.0f, 0.0f, 1.0f), triViewed, clipped[0], clipped[1]);
 
-                //Scale into view
-                Vec3D vOffsetView = new Vec3D(1.0f, 1.0f, 0.0f);
-                triProjected.points[0] = Vec3D.add(triProjected.points[0], vOffsetView);
-                triProjected.points[1] = Vec3D.add(triProjected.points[1], vOffsetView);
-                triProjected.points[2] = Vec3D.add(triProjected.points[2], vOffsetView);
-
-                triProjected.points[0].X *= 0.5f * fScreenWidth;
-                triProjected.points[0].Y *= 0.5f * fScreenHeight;
-                triProjected.points[1].X *= 0.5f * fScreenWidth;
-                triProjected.points[1].Y *= 0.5f * fScreenHeight;
-                triProjected.points[2].X *= 0.5f * fScreenWidth;
-                triProjected.points[2].Y *= 0.5f * fScreenHeight;
+                for (int n = 0; n < nClippedTriangles; n++) {
 
 
-                trisToDraw.add(triProjected);
+                    Triangle triProjected = new Triangle(
+                            Matrix.vectorMultiply(clipped[n].points[0], matProj),
+                            Matrix.vectorMultiply(clipped[n].points[1], matProj),
+                            Matrix.vectorMultiply(clipped[n].points[2], matProj));
+                    triProjected.lum = clipped[n].lum;
+                    //triProjected.updateColor(baseColor);
+                    triProjected.color = clipped[n].color;
+
+                    triProjected.points[0] = Vec3D.divide(triProjected.points[0], triProjected.points[0].W);
+                    triProjected.points[1] = Vec3D.divide(triProjected.points[1], triProjected.points[1].W);
+                    triProjected.points[2] = Vec3D.divide(triProjected.points[2], triProjected.points[2].W);
+
+                    triProjected.points[0].X *= -1.0f;
+                    triProjected.points[1].X *= -1.0f;
+                    triProjected.points[2].X *= -1.0f;
+                    triProjected.points[0].Y *= -1.0f;
+                    triProjected.points[1].Y *= -1.0f;
+                    triProjected.points[2].Y *= -1.0f;
+
+                    //Scale into view
+                    Vec3D vOffsetView = new Vec3D(1.0f, 1.0f, 0.0f);
+                    triProjected.points[0] = Vec3D.add(triProjected.points[0], vOffsetView);
+                    triProjected.points[1] = Vec3D.add(triProjected.points[1], vOffsetView);
+                    triProjected.points[2] = Vec3D.add(triProjected.points[2], vOffsetView);
+
+                    triProjected.points[0].X *= 0.5f * fScreenWidth;
+                    triProjected.points[0].Y *= 0.5f * fScreenHeight;
+                    triProjected.points[1].X *= 0.5f * fScreenWidth;
+                    triProjected.points[1].Y *= 0.5f * fScreenHeight;
+                    triProjected.points[2].X *= 0.5f * fScreenWidth;
+                    triProjected.points[2].Y *= 0.5f * fScreenHeight;
 
 
-                /*
-                g.setColor(triProjected.color);
-                int[] Xs = new int[]{(int) triProjected.points[0].X, (int) triProjected.points[1].X, (int) triProjected.points[2].X};
-                int[] Ys = new int[]{(int) triProjected.points[0].Y, (int) triProjected.points[1].Y, (int) triProjected.points[2].Y};
-                g.fillPolygon(Xs, Ys, 3);
-                */
-                /*
-                g.setColor(Color.black);
-                g.drawLine((int) triProjected.points[0].X, (int) triProjected.points[0].Y, (int) triProjected.points[1].X, (int) triProjected.points[1].Y);
-                g.drawLine((int) triProjected.points[1].X, (int) triProjected.points[1].Y, (int) triProjected.points[2].X, (int) triProjected.points[2].Y);
-                g.drawLine((int) triProjected.points[2].X, (int) triProjected.points[2].Y, (int) triProjected.points[0].X, (int) triProjected.points[0].Y);
-                */
+                    trisToDraw.add(triProjected);
+
+
+                    /*
+                    g.setColor(triProjected.color);
+                    int[] Xs = new int[]{(int) triProjected.points[0].X, (int) triProjected.points[1].X, (int) triProjected.points[2].X};
+                    int[] Ys = new int[]{(int) triProjected.points[0].Y, (int) triProjected.points[1].Y, (int) triProjected.points[2].Y};
+                    g.fillPolygon(Xs, Ys, 3);
+                    */
+                    /*
+                    g.setColor(Color.black);
+                    g.drawLine((int) triProjected.points[0].X, (int) triProjected.points[0].Y, (int) triProjected.points[1].X, (int) triProjected.points[1].Y);
+                    g.drawLine((int) triProjected.points[1].X, (int) triProjected.points[1].Y, (int) triProjected.points[2].X, (int) triProjected.points[2].Y);
+                    g.drawLine((int) triProjected.points[2].X, (int) triProjected.points[2].Y, (int) triProjected.points[0].X, (int) triProjected.points[0].Y);
+                    */
+                }
             }
         }
         return trisToDraw;

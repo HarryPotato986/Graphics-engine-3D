@@ -14,8 +14,24 @@ public class Vec3D {
     }
 
     public void normalize() {
-        float l = length(this);
-        divide(this, l);
+        Vec3D result = new Vec3D(this);
+        float l = length(result);
+        result = divide(result, l);
+        X = result.X;
+        Y = result.Y;
+        Z = result.Z;
+        W = result.W;
+
+        /*
+        float l2 = length(this);
+        if (l2 > 1) {
+            System.out.println(l2);
+        }
+        */
+    }
+
+    public float len() {
+        return length(this);
     }
 
 
@@ -54,5 +70,23 @@ public class Vec3D {
     public static Vec3D normalize(Vec3D v) {
         float l = length(v);
         return divide(v, l);
+    }
+
+    public static Vec3D intersectPlane(Vec3D planeP, Vec3D planeN, Vec3D lineStart, Vec3D lineEnd) {
+        planeN.normalize();
+
+        /*
+        if (planeN.len() > 1.0f) {
+            System.out.println(planeN.len());
+        }
+        */
+
+        float planeDP = -Vec3D.dotProduct(planeN, planeP);
+        float ad = Vec3D.dotProduct(lineStart, planeN);
+        float bd = Vec3D.dotProduct(lineEnd, planeN);
+        float t = (-planeDP - ad) / (bd - ad);
+        Vec3D lineStartToEnd = Vec3D.subtract(lineEnd, lineStart);
+        Vec3D lineToIntersect = Vec3D.multiply(lineStartToEnd, t);
+        return Vec3D.add(lineStart, lineToIntersect);
     }
 }
